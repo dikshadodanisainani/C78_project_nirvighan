@@ -1,0 +1,203 @@
+import React from 'react';
+import { StyleSheet, Text, View,TouchableOpacity,Alert,TextInput } from 'react-native';
+import db from '../Config';
+import firebase from 'firebase';
+import WelcomeScreen from './WelcomeScreen';
+
+export default class SignUpScreen extends React.Component{
+    constructor(props){
+        super(props);
+        this.state = {
+            firstName:'',
+            lastName:'',
+            contact:'',
+            address:'',
+            emailAddress:'',
+            password:'',
+            confirmPassword:'',
+        }
+    }
+
+    UserSignUp = (emailAddress, password,confirmPassword) =>{
+        if(password !== confirmPassword){
+            return Alert.alert("password doesn't match\nCheck your password.")
+        }else{
+            console.log(this.state.emailAddress);
+          firebase.auth().createUserWithEmailAndPassword(emailAddress, password)
+          .then((response)=>{
+            db.collection('users').add({
+              first_name:this.state.firstName,
+              last_name:this.state.lastName,
+              mobile_number:this.state.contact,
+              
+              address:this.state.address
+            })
+            return  Alert.alert('User Added Successfully');
+
+          })
+          .catch(function(error) {
+            // Handle Errors here.
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            
+            return Alert.alert(errorMessage)
+          });
+        }
+    
+      }
+    
+        
+   
+        
+
+    render(){
+        return(
+            <View style = {styles.screen}>
+             <Text style = {styles.heading}>PLEASE FILL THE BELOW INFORMATION TO SIGN UP</Text>  
+             <TextInput
+          style={styles.textBox}
+          placeholder ={"First Name"}
+          maxLength ={8}
+          onChangeText={(text)=>{
+            this.setState({
+              firstName: text
+            })
+          }}
+        />
+        <TextInput
+          style={styles.textBox}
+          placeholder ={"Last Name"}
+          maxLength ={8}
+          onChangeText={(text)=>{
+            this.setState({
+              lastName: text
+            })
+          }}
+        />
+        <TextInput
+          style={styles.textBox}
+          placeholder ={"Contact"}
+          maxLength ={10}
+          keyboardType={'numeric'}
+          onChangeText={(text)=>{
+            this.setState({
+              contact: text
+            })
+          }}
+        />
+        <TextInput
+          style={styles.textBox}
+          placeholder ={"Address"}
+          multiline = {true}
+          onChangeText={(text)=>{
+            this.setState({
+              address: text
+            })
+          }}
+        />
+        <TextInput
+          style={styles.textBox}
+          placeholder ={"Email"}
+         // keyboardType ={'email-address'}
+          onChangeText={(text)=>{
+            this.setState({
+              emailAddress: text
+            })
+          }}
+        /><TextInput
+          style={styles.textBox}
+          placeholder ={"Password"}
+         // secureTextEntry = {true}
+          onChangeText={(text)=>{
+            this.setState({
+              password: text
+            })
+          }}
+        /><TextInput
+          style={styles.textBox}
+          placeholder ={"Confrim Password"}
+          secureTextEntry = {true}
+          onChangeText={(text)=>{
+            this.setState({
+              confirmPassword: text
+            })
+          }}
+        />
+             <TouchableOpacity
+            style = {styles.button}
+            onPress = {() => {
+               
+                
+                this.UserSignUp(this.state.emailAddress,this.state.password,this.state.confirmPassword);
+                this.props.navigation.navigate('WelcomeScreen');
+    }
+            }
+             >
+                 <Text style = {styles.buttonText}>Sign Up</Text>
+             </TouchableOpacity>
+            </View>
+            
+        )
+        
+    }
+    
+}
+
+
+
+
+const styles = StyleSheet.create({
+    screen:{
+        width:'100%',
+        height:'100%',
+        alignItems:'center',
+        backgroundColor:'#4A148C',
+        flex:1
+
+    },
+
+    heading:{
+        fontSize:30,
+        fontWeight:'bold',
+        alignSelf:'center',
+        marginTop:30,
+        color:'#fff'
+    },
+
+    textBox:{
+        width: 300,
+      height: 40,
+      borderBottomWidth: 1.5,
+      borderColor : '#fff',
+      fontSize: 20,
+      alignSelf:'center',
+      color:'#fff'
+    },
+
+    button:{
+        width:300,
+      height:50,
+      justifyContent:'center',
+      alignItems:'center',
+      alignSelf:'center',
+      borderRadius:25,
+      backgroundColor:"#fff",
+      marginTop:20,
+      shadowColor: "#ffffff",
+      shadowOffset: {
+         width: 0,
+         height: 8,
+      },
+      shadowOpacity: 0.40,
+      shadowRadius: 10.32,
+      elevation: 16,
+    },
+
+    buttonText:{
+        color:'#4A148C',
+        fontWeight:'bold',
+        fontSize:20
+    }
+
+    
+})
